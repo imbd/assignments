@@ -1,0 +1,213 @@
+package ru.spbau.mit;
+
+
+import java.io.*;
+import java.util.*;
+
+
+import ru.spbau.mit.StringSet;
+import ru.spbau.mit.StreamSerializable;
+
+
+
+public class StringSetImpl implements StreamSerializable,StringSet {
+
+
+    private static class Node {
+
+        private int count;
+        private Node[] next;
+        private boolean isTerm;
+
+        public Node() {
+            next = new Node[charNum];
+            count = 0;
+            isTerm = false;
+
+        }
+
+    }
+
+    private int size;
+    private Node root;
+    private static final int charNum = 52;
+    public StringSetImpl() {
+        size = 0;
+        root = new Node();
+    }
+
+
+    private int	number(char c){
+        if (Character.isUpperCase(c))
+            return (c - 'A');
+        else
+            return (c - 'a' + 26);
+    }
+
+
+
+    public boolean add(String element) {
+
+        Node curNode = root;
+        if (contains(element))
+            return false;
+        for (int i = 0; i < element.length(); i++) {
+            int num = number(element.charAt(i));
+            if (curNode.next[num] != null) {
+                curNode.next[num].count++;
+            }
+            else {
+                curNode.next[num] = new Node();
+                curNode.next[num].count++;
+            }
+
+            curNode = curNode.next[num];
+        }
+        if (curNode.isTerm)
+            return false;
+        else {
+            curNode.isTerm = true;
+            size++;
+        }
+        return true;
+
+    }
+
+
+    public boolean contains(String element) {
+        Node curNode = root;
+        for (int i = 0; i < element.length(); i++) {
+            int num = number(element.charAt(i));
+            if (curNode.next[num] == null)
+                return false;
+            curNode = curNode.next[num];
+        }
+        return curNode.isTerm;
+    }
+
+
+    public boolean remove(String element) {
+
+        Node curNode = root;
+        if (!contains(element))
+            return false;
+
+        for (int i = 0; i < element.length(); i++) {
+
+            int num = number(element.charAt(i));
+            curNode.next[num].count--;
+            if (curNode.next[num].count == 0) {
+                Node tmpNode = curNode;
+                curNode = curNode.next[num];
+            }
+            else
+                curNode = curNode.next[num];
+        }
+
+        size--;
+        curNode.isTerm = false;
+        return true;
+    }
+
+
+    public int size() {
+        return size;
+    }
+
+    public int howManyStartsWithPrefix(String prefix) {
+
+        Node curNode = root;
+        for (int i = 0; i < prefix.length(); i++) {
+            int num = number(prefix.charAt(i));
+            if (curNode.next[num] == null)
+                return 0;
+            curNode = curNode.next[num];
+        }
+        return curNode.count;
+    }
+
+
+    private void makeOutput(Node curNode, OutputStream out) throws IOException {
+
+        byte[] b = new byte[4];
+        for (int i = 0; i < charNum; i++) {
+
+            if (curNode.next[i] == null) {
+
+                int a = -1;
+                b[3] = (byte) a;
+                b[2] = (byte) ((a >> 8));
+                b[1] = (byte) ((a >> 16));
+                b[0] = (byte) ((a >> 24));
+                out.write(b);
+            } else {
+
+                int a = curNode.next[i].count;
+                b[3] = (byte) a;
+                b[2] = (byte) ((a >> 8));
+                b[1] = (byte) ((a >> 16));
+                b[0] = (byte) ((a >> 24));
+                out.write(b);
+                byte[] x = new byte[1];
+                x[0] = (byte) (curNode.next[i].isTerm ? 1 : 0);
+                out.write(x);
+                makeOutput(curNode.next[i], out);
+
+            }
+
+        }
+    }
+    public void serialize(OutputStream out) {
+
+        try {
+
+            makeOutput(root, out);
+        } 
+        catch (IOException io) {
+            throw new SerializationException();
+        }
+    }
+
+
+
+    private void makeTree(Node curNode, InputStream in) throws IOException{
+
+        byte[] data = new byte[4];
+        byte[] x = new byte[1];
+        int num;
+        for (int i = 0; i < charNum; i++) {
+
+            int k = in.read(data);
+            num = (data[0] << 24) | (data[1] & 0xFF) << 16 | (data[2] & 0xFF) << 8 | (data[3] & 0xFF);
+
+            if (num != -1) {
+
+                int l = in.read(x);
+                curNode.next[i] = new Node();
+                curNode.next[i].isTerm = (x[0] == 1);
+                curNode.next[i].count = num;
+                makeTree(curNode.next[i], in);
+            }
+
+        }
+
+    }
+
+    public void deserialize(InputStream in) {
+
+        root = new Node();
+        size = 0;
+
+        try {
+            makeTree(root, in);
+        }
+        catch (IOException io) {
+            throw new SerializationException();
+        }
+
+        for (int i = 0; i < charNum; i++)
+            if (root.next[i] != null)
+                size += root.next[i].count;
+    }
+
+}
