@@ -1,6 +1,7 @@
 package ru.spbau.mit;
 
 
+import javax.swing.*;
 import java.io.*;
 
 
@@ -46,6 +47,7 @@ public class StringSetImpl implements StreamSerializable,StringSet {
         Node curNode = root;
         if (contains(element))
             return false;
+        root.count++;
         for (int i = 0; i < element.length(); i++) {
             int num = number(element.charAt(i));
             if (curNode.next[num] != null) {
@@ -83,7 +85,7 @@ public class StringSetImpl implements StreamSerializable,StringSet {
         Node curNode = root;
         if (!contains(element))
             return false;
-
+        root.count--;
         for (int i = 0; i < element.length(); i++) {
 
             int num = number(element.charAt(i));
@@ -107,7 +109,7 @@ public class StringSetImpl implements StreamSerializable,StringSet {
     }
 
     public int howManyStartsWithPrefix(String prefix) {
-
+        
         Node curNode = root;
         for (int i = 0; i < prefix.length(); i++) {
             int num = number(prefix.charAt(i));
@@ -228,5 +230,26 @@ public class StringSetImpl implements StreamSerializable,StringSet {
                 size += root.next[i].count;
 
     }
+    /*public static void main(String[] args) {
+
+        StringSetImpl Bor = new StringSetImpl();
+
+        Bor.add("abc");
+        Bor.add("cde");
+        Bor.add("");
+        Bor.add("");
+        Bor.add("cde");
+        Bor.remove("cde");
+        Bor.add("cde");
+        Bor.add("aa");
+        Bor.remove("aa");
+        Bor.remove("");
+        Bor.add("");
+        //Bor.remove("");
+
+        System.out.println(Bor.size());
+        System.out.println(Bor.howManyStartsWithPrefix(""));
+        System.out.println(Bor.howManyStartsWithPrefix("cde"));
+    }*/
 
 }
