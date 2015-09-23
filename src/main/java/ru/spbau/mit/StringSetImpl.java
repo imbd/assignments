@@ -2,11 +2,6 @@ package ru.spbau.mit;
 
 
 import java.io.*;
-import java.util.*;
-
-
-import ru.spbau.mit.StringSet;
-import ru.spbau.mit.StreamSerializable;
 
 
 
@@ -63,12 +58,9 @@ public class StringSetImpl implements StreamSerializable,StringSet {
 
             curNode = curNode.next[num];
         }
-        if (curNode.isTerm)
-            return false;
-        else {
-            curNode.isTerm = true;
-            size++;
-        }
+
+        curNode.isTerm = true;
+        size++;
         return true;
 
     }
@@ -160,6 +152,18 @@ public class StringSetImpl implements StreamSerializable,StringSet {
     public void serialize(OutputStream out) {
 
         try {
+            byte[] b = new byte[4];
+            int a = root.count;
+            b[3] = (byte) a;
+            b[2] = (byte) ((a >> 8));
+            b[1] = (byte) ((a >> 16));
+            b[0] = (byte) ((a >> 24));
+            out.write(b);
+            if (root != null) {
+                byte[] x = new byte[1];
+                x[0] = (byte) (root.isTerm ? 1 : 0);
+                out.write(x);
+            }
 
             makeOutput(root, out);
         } 
@@ -198,16 +202,31 @@ public class StringSetImpl implements StreamSerializable,StringSet {
         root = new Node();
         size = 0;
 
+
         try {
+
+            byte[] data = new byte[4];
+            byte[] x = new byte[1];
+            int k = in.read(data);
+            int num = (data[0] << 24) | (data[1] & 0xFF) << 16 | (data[2] & 0xFF) << 8 | (data[3] & 0xFF);
+
+            if (num != -1) {
+                int l = in.read(x);
+                root.isTerm = (x[0] == 1);
+                root.count = num;
+            }
+
             makeTree(root, in);
         }
         catch (IOException io) {
             throw new SerializationException();
         }
 
+        size += root.count;
         for (int i = 0; i < charNum; i++)
             if (root.next[i] != null)
                 size += root.next[i].count;
+
     }
 
 }
