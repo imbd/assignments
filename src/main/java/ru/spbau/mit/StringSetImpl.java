@@ -109,7 +109,7 @@ public class StringSetImpl implements StreamSerializable,StringSet {
     }
 
     public int howManyStartsWithPrefix(String prefix) {
-        
+
         Node curNode = root;
         for (int i = 0; i < prefix.length(); i++) {
             int num = number(prefix.charAt(i));
@@ -124,11 +124,12 @@ public class StringSetImpl implements StreamSerializable,StringSet {
     private void makeOutput(Node curNode, OutputStream out) throws IOException {
 
         byte[] b = new byte[4];
+        int a;
         for (int i = 0; i < charNum; i++) {
 
             if (curNode.next[i] == null || curNode.next[i].count == 0) {
 
-                int a = -1;
+                a = -1;
                 b[3] = (byte) a;
                 b[2] = (byte) ((a >> 8));
                 b[1] = (byte) ((a >> 16));
@@ -136,7 +137,7 @@ public class StringSetImpl implements StreamSerializable,StringSet {
                 out.write(b);
             } else {
 
-                int a = curNode.next[i].count;
+                a = curNode.next[i].count;
                 b[3] = (byte) a;
                 b[2] = (byte) ((a >> 8));
                 b[1] = (byte) ((a >> 16));
@@ -161,11 +162,10 @@ public class StringSetImpl implements StreamSerializable,StringSet {
             b[1] = (byte) ((a >> 16));
             b[0] = (byte) ((a >> 24));
             out.write(b);
-            if (root != null) {
-                byte[] x = new byte[1];
-                x[0] = (byte) (root.isTerm ? 1 : 0);
-                out.write(x);
-            }
+
+            byte[] x = new byte[1];
+            x[0] = (byte) (root.isTerm ? 1 : 0);
+            out.write(x);
 
             makeOutput(root, out);
         } 
@@ -224,10 +224,7 @@ public class StringSetImpl implements StreamSerializable,StringSet {
             throw new SerializationException();
         }
 
-        size += root.count;
-        for (int i = 0; i < charNum; i++)
-            if (root.next[i] != null)
-                size += root.next[i].count;
+        size = root.count;
 
     }
     /*public static void main(String[] args) {
