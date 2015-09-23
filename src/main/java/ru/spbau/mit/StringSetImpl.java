@@ -132,7 +132,7 @@ public class StringSetImpl implements StreamSerializable,StringSet {
         byte[] b = new byte[4];
         for (int i = 0; i < charNum; i++) {
 
-            if (curNode.next[i] == null) {
+            if (curNode.next[i] == null || curNode.next[i].count == 0) {
 
                 int a = -1;
                 b[3] = (byte) a;
