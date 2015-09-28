@@ -172,6 +172,7 @@ public class StringSetImpl implements StreamSerializable,StringSet {
 
 				curNode.next[i] = new Node();
 				curNode.next[i].isTerm = (y[0] == 1);
+				curNode.count += (int)y[0];
 				makeTree(curNode.next[i], in);
 				curNode.count += curNode.next[i].count;
 			}
@@ -199,4 +200,26 @@ public class StringSetImpl implements StreamSerializable,StringSet {
 
 		size = root.count;
 	}
+
+	public static void main(String[] args) {
+
+         StringSetImpl Bor = new StringSetImpl();
+
+         Bor.add("abc");
+         Bor.add("cde");
+         Bor.add("");
+         Bor.add("");
+         Bor.add("cde");
+         Bor.remove("cde");
+         Bor.add("cde");
+         Bor.add("aa");
+         Bor.remove("aa");
+         Bor.remove("");
+         Bor.add("");
+         //Bor.remove("");
+
+         System.out.println(Bor.size());
+         System.out.println(Bor.howManyStartsWithPrefix(""));
+         System.out.println(Bor.howManyStartsWithPrefix("cde"));
+     }
 }
