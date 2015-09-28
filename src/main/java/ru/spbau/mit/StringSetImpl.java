@@ -30,6 +30,17 @@ public class StringSetImpl implements StreamSerializable,StringSet {
 		}
 	}
 
+	private boolean exists(String element) {
+		Node curNode = root;
+		for (char c: element.toCharArray()) {
+			int num = number(c);
+			if (curNode.next[num] == null) {
+				return false;
+			}
+			curNode = curNode.next[num];
+		}
+		return true;
+	}
 
 	public boolean add(String element) {
 
@@ -40,14 +51,10 @@ public class StringSetImpl implements StreamSerializable,StringSet {
 		root.count++;
 		for (char c: element.toCharArray()) {
 			int num = number(c);
-			if (curNode.next[num] != null) {
-				curNode.next[num].count++;
-			}
-			else {
+			if (curNode.next[num] == null) {
 				curNode.next[num] = new Node();
-				curNode.next[num].count++;
 			}
-
+			curNode.next[num].count++;
 			curNode = curNode.next[num];
 		}
 
@@ -59,12 +66,13 @@ public class StringSetImpl implements StreamSerializable,StringSet {
 
 
 	public boolean contains(String element) {
+
+		if (!exists(element)) {
+			return false;
+		}
 		Node curNode = root;
 		for (char c: element.toCharArray()) {
 			int num = number(c);
-			if (curNode.next[num] == null) {
-				return false;
-			}
 			curNode = curNode.next[num];
 		}
 		return curNode.isTerm;
@@ -82,13 +90,7 @@ public class StringSetImpl implements StreamSerializable,StringSet {
 
 			int num = number(c);
 			curNode.next[num].count--;
-			if (curNode.next[num].count == 0) {
-				Node tmpNode = curNode;
-				curNode = curNode.next[num];
-			}
-			else {
-				curNode = curNode.next[num];
-			}
+			curNode = curNode.next[num];
 		}
 
 		size--;
@@ -103,7 +105,7 @@ public class StringSetImpl implements StreamSerializable,StringSet {
 
 	public int howManyStartsWithPrefix(String prefix) {
 
-		if (!contains(prefix)) {
+		if (!exists(prefix)) {
 			return 0;
 		}
 		Node curNode = root;
@@ -198,7 +200,6 @@ public class StringSetImpl implements StreamSerializable,StringSet {
 
 		root = new Node();
 		size = 0;
-
 
 		try {
 
