@@ -173,53 +173,30 @@ public class StringSetImpl implements StreamSerializable,StringSet {
 				curNode.next[i] = new Node();
 				curNode.next[i].isTerm = (y[0] == 1);
 				curNode.count += (int)y[0];
+				size += (int)y[0];
 				makeTree(curNode.next[i], in);
 				curNode.count += curNode.next[i].count;
 			}
 
 		}
-
 	}
 
 	public void deserialize(InputStream in) {
 
 		root = new Node();
 		size = 0;
-
 		try {
 
 			byte[] x = new byte[1];
 			int k = in.read(x);
 			root.isTerm = (x[0] == 1);
 			root.count += (int)x[0];
+			size += (int)x[0];
 			makeTree(root, in);
 		}
 		catch (IOException io) {
 			throw new SerializationException();
 		}
-
-		size = root.count;
+		//size = root.count;
 	}
-
-	public static void main(String[] args) {
-
-         StringSetImpl Bor = new StringSetImpl();
-
-         Bor.add("abc");
-         Bor.add("cde");
-         Bor.add("");
-         Bor.add("");
-         Bor.add("cde");
-         Bor.remove("cde");
-         Bor.add("cde");
-         Bor.add("aa");
-         Bor.remove("aa");
-         Bor.remove("");
-         Bor.add("");
-         //Bor.remove("");
-
-         System.out.println(Bor.size());
-         System.out.println(Bor.howManyStartsWithPrefix(""));
-         System.out.println(Bor.howManyStartsWithPrefix("cde"));
-     }
 }
