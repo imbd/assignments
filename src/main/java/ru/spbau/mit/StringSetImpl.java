@@ -103,12 +103,12 @@ public class StringSetImpl implements StreamSerializable,StringSet {
 
 	public int howManyStartsWithPrefix(String prefix) {
 
+		if (!contains(prefix)) {
+			return 0;
+		}
 		Node curNode = root;
 		for (char c: prefix.toCharArray()) {
 			int num = number(c);
-			if (curNode.next[num] == null) {
-				return 0;
-			}
 			curNode = curNode.next[num];
 		}
 		return curNode.count;
