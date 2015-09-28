@@ -191,7 +191,7 @@ public class StringSetImpl implements StreamSerializable,StringSet {
 			byte[] x = new byte[1];
 			int k = in.read(x);
 			root.isTerm = (x[0] == 1);
-
+			root.count += (int)x[0];
 			makeTree(root, in);
 		}
 		catch (IOException io) {
