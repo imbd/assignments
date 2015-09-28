@@ -38,8 +38,8 @@ public class StringSetImpl implements StreamSerializable,StringSet {
 			return false;
 		}
 		root.count++;
-		for (int i = 0; i < element.length(); i++) {
-			int num = number(element.charAt(i));
+		for (char c: element.toCharArray()) {
+			int num = number(c);
 			if (curNode.next[num] != null) {
 				curNode.next[num].count++;
 			}
@@ -60,8 +60,8 @@ public class StringSetImpl implements StreamSerializable,StringSet {
 
 	public boolean contains(String element) {
 		Node curNode = root;
-		for (int i = 0; i < element.length(); i++) {
-			int num = number(element.charAt(i));
+		for (char c: element.toCharArray()) {
+			int num = number(c);
 			if (curNode.next[num] == null) {
 				return false;
 			}
@@ -78,9 +78,9 @@ public class StringSetImpl implements StreamSerializable,StringSet {
 			return false;
 		}
 		root.count--;
-		for (int i = 0; i < element.length(); i++) {
+		for (char c: element.toCharArray()) {
 
-			int num = number(element.charAt(i));
+			int num = number(c);
 			curNode.next[num].count--;
 			if (curNode.next[num].count == 0) {
 				Node tmpNode = curNode;
@@ -104,8 +104,8 @@ public class StringSetImpl implements StreamSerializable,StringSet {
 	public int howManyStartsWithPrefix(String prefix) {
 
 		Node curNode = root;
-		for (int i = 0; i < prefix.length(); i++) {
-			int num = number(prefix.charAt(i));
+		for (char c: prefix.toCharArray()) {
+			int num = number(c);
 			if (curNode.next[num] == null) {
 				return 0;
 			}
