@@ -1,56 +1,44 @@
 package ru.spbau.mit;
 
-
-import javax.swing.*;
 import java.io.*;
 
 
 
 public class StringSetImpl implements StreamSerializable,StringSet {
 
-
     private static class Node {
 
-        private int count;
-        private Node[] next;
-        private boolean isTerm;
-
-        public Node() {
-            next = new Node[charNum];
-            count = 0;
-            isTerm = false;
-
-        }
+        private int count = 0;
+        private Node[] next = new Node[charNum];
+        private boolean isTerm = false;
 
     }
 
-    private int size;
-    private Node root;
+    private int size = 0;
+    private Node root = new Node();
     private static final int charNum = 52;
-    public StringSetImpl() {
-        size = 0;
-        root = new Node();
-    }
 
 
-    private int	number(char c){
-        if (Character.isUpperCase(c))
-            return (c - 'A');
-        else
+    private int number(char c){
+        if (Character.isUpperCase(c)) {
+			return (c - 'A');
+        }
+        else {
             return (c - 'a' + 26);
+        }
     }
-
-
 
     public boolean add(String element) {
 
         Node curNode = root;
-        if (contains(element))
-            return false;
+        if (contains(element)) {
+			return false;
+		}
         root.count++;
-        for (int i = 0; i < element.length(); i++) {
-            int num = number(element.charAt(i));
-            if (curNode.next[num] != null) {
+
+		for (char c: element.toCharArray()) {
+            int num = number(c);
+			if (curNode.next[num] != null) {
                 curNode.next[num].count++;
             }
             else {
@@ -67,35 +55,35 @@ public class StringSetImpl implements StreamSerializable,StringSet {
 
     }
 
-
     public boolean contains(String element) {
         Node curNode = root;
-        for (int i = 0; i < element.length(); i++) {
-            int num = number(element.charAt(i));
-            if (curNode.next[num] == null)
-                return false;
+		for (char c: element.toCharArray()) {
+			int num = number(c);
+            if (curNode.next[num] == null) {
+				return false;
+			}
             curNode = curNode.next[num];
         }
         return curNode.isTerm;
     }
 
-
     public boolean remove(String element) {
 
         Node curNode = root;
-        if (!contains(element))
-            return false;
+        if (!contains(element)) {
+			return false;
+		}
         root.count--;
-        for (int i = 0; i < element.length(); i++) {
-
-            int num = number(element.charAt(i));
+		for (char c: element.toCharArray()) {
+			int num = number(c);
             curNode.next[num].count--;
             if (curNode.next[num].count == 0) {
-                Node tmpNode = curNode;
-                curNode = curNode.next[num];
+                curNode.next[num] = null;
+                return true;
             }
-            else
-                curNode = curNode.next[num];
+            else {
+				curNode = curNode.next[num];
+			}
         }
 
         size--;
@@ -103,23 +91,22 @@ public class StringSetImpl implements StreamSerializable,StringSet {
         return true;
     }
 
-
     public int size() {
         return size;
     }
 
     public int howManyStartsWithPrefix(String prefix) {
 
-        Node curNode = root;
-        for (int i = 0; i < prefix.length(); i++) {
-            int num = number(prefix.charAt(i));
-            if (curNode.next[num] == null)
-                return 0;
+		if (!contains(prefix)) {
+			return 0;
+		}
+		Node curNode = root;
+		for (char c: prefix.toCharArray()) {
+			int num = number(c);
             curNode = curNode.next[num];
         }
         return curNode.count;
     }
-
 
     private void makeOutput(Node curNode, OutputStream out) throws IOException {
 
@@ -152,6 +139,7 @@ public class StringSetImpl implements StreamSerializable,StringSet {
 
         }
     }
+
     public void serialize(OutputStream out) {
 
         try {
@@ -173,8 +161,6 @@ public class StringSetImpl implements StreamSerializable,StringSet {
             throw new SerializationException();
         }
     }
-
-
 
     private void makeTree(Node curNode, InputStream in) throws IOException{
 
@@ -204,7 +190,6 @@ public class StringSetImpl implements StreamSerializable,StringSet {
         root = new Node();
         size = 0;
 
-
         try {
 
             byte[] data = new byte[4];
@@ -223,30 +208,6 @@ public class StringSetImpl implements StreamSerializable,StringSet {
         catch (IOException io) {
             throw new SerializationException();
         }
-
         size = root.count;
-
     }
-    /*public static void main(String[] args) {
-
-        StringSetImpl Bor = new StringSetImpl();
-
-        Bor.add("abc");
-        Bor.add("cde");
-        Bor.add("");
-        Bor.add("");
-        Bor.add("cde");
-        Bor.remove("cde");
-        Bor.add("cde");
-        Bor.add("aa");
-        Bor.remove("aa");
-        Bor.remove("");
-        Bor.add("");
-        //Bor.remove("");
-
-        System.out.println(Bor.size());
-        System.out.println(Bor.howManyStartsWithPrefix(""));
-        System.out.println(Bor.howManyStartsWithPrefix("cde"));
-    }*/
-
 }
