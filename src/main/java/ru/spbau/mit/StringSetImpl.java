@@ -16,7 +16,6 @@ public class StringSetImpl implements StreamSerializable,StringSet {
 
 	}
 
-	private int size = 0;
 	private Node root = new Node();
 	private static final int charNum = 52;
 
@@ -59,7 +58,6 @@ public class StringSetImpl implements StreamSerializable,StringSet {
 		}
 
 		curNode.isTerm = true;
-		size++;
 		return true;
 
 	}
@@ -93,14 +91,13 @@ public class StringSetImpl implements StreamSerializable,StringSet {
 			curNode = curNode.next[num];
 		}
 
-		size--;
 		curNode.isTerm = false;
 		return true;
 	}
 
 
 	public int size() {
-		return root.count;//size;
+		return root.count;
 	}
 
 	public int howManyStartsWithPrefix(String prefix) {
@@ -119,11 +116,11 @@ public class StringSetImpl implements StreamSerializable,StringSet {
 
 	private void makeOutput(Node curNode, OutputStream out) throws IOException {
 
-		byte[] x = new byte[1];
+		byte x;
 
 		for (int i = 0; i < charNum; i++) {
 
-			x[0] = 0;
+			x = 0;
 			if (curNode.next[i] == null || curNode.next[i].count == 0) {
 
 				out.write(x);
@@ -131,9 +128,9 @@ public class StringSetImpl implements StreamSerializable,StringSet {
 			}
 			else {
 
-				x[0] = 1;
+				x = 1;
 				out.write(x);
-				x[0] = (byte) (curNode.next[i].isTerm ? 1 : 0);
+				x = (byte) (curNode.next[i].isTerm ? 1 : 0);
 				out.write(x);
 				makeOutput(curNode.next[i], out);
 
@@ -145,8 +142,8 @@ public class StringSetImpl implements StreamSerializable,StringSet {
 
 		try {
 
-			byte[] t = new byte[1];
-			t[0] = (byte) (root.isTerm ? 1 : 0);
+
+			byte t = (byte) (root.isTerm ? 1 : 0);
 			out.write(t);
 			makeOutput(root, out);
 		}
@@ -158,19 +155,17 @@ public class StringSetImpl implements StreamSerializable,StringSet {
 
 	private void makeTree(Node curNode, InputStream in) throws IOException {
 
-		byte[] x = new byte[1];
-		byte[] y = new byte[1];
 		int num;
 		for (int i = 0; i < charNum; i++) {
 
-			int k = in.read(x);
-			int l = in.read(y);
+			byte k = (byte)in.read();
+			byte l = (byte)in.read();
 
-			if (x[0] == 1) {
+			if (k == 1) {
 
 				curNode.next[i] = new Node();
-				curNode.next[i].isTerm = (y[0] == 1);
-				curNode.count += (int)y[0];
+				curNode.next[i].isTerm = (l == 1);
+				curNode.count += (int)l;
 				makeTree(curNode.next[i], in);
 				curNode.count += curNode.next[i].count;
 			}
@@ -181,18 +176,15 @@ public class StringSetImpl implements StreamSerializable,StringSet {
 	public void deserialize(InputStream in) {
 
 		root = new Node();
-		size = 0;
 		try {
 
-			byte[] x = new byte[1];
-			int k = in.read(x);
-			root.isTerm = (x[0] == 1);
-			root.count += (int)x[0];
+			byte x = (byte)in.read();
+			root.isTerm = (x == 1);
+			root.count += (int)x;
 			makeTree(root, in);
 		}
 		catch (IOException io) {
 			throw new SerializationException();
 		}
-		size = root.count;
 	}
 }
