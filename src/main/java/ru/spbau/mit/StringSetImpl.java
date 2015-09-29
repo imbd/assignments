@@ -165,7 +165,7 @@ public class StringSetImpl implements StreamSerializable,StringSet {
 
 				curNode.next[i] = new Node();
 				curNode.next[i].isTerm = (l == 1);
-				curNode.count += (int)l;
+				curNode.next[i].count += (int)l;
 				makeTree(curNode.next[i], in);
 				curNode.count += curNode.next[i].count;
 			}
