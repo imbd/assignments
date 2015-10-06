@@ -24,6 +24,7 @@ public abstract class Collections {
                 res.add(element);
             }
         }
+        
         return res;
 
     }
