@@ -5,7 +5,7 @@ public abstract class Function2 <T1, T2, R> {
 
     public abstract R apply(T1 x, T2 y);
 
-    public <R2> Function2 <T1, T2, R2> compose(final Function1<? super R, R2> g) {
+    public <R2> Function2 <T1, T2, R2> compose(final Function1<? super R, ? extends R2> g) {
 
         return new Function2<T1, T2, R2>() {
             @Override
