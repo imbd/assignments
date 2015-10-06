@@ -9,25 +9,20 @@ import static org.junit.Assert.*;
 
 public class TestCollections {
 
-    private static final Predicate<Object> lenMod5Is3 = new Predicate<Object>() {
+    private static final Predicate<Integer> MoreThanNull = new Predicate<Integer>() {
 
         @Override
-        public Boolean apply(Object x) {
-            return x.toString().length() % 5 == 3;
+        public Boolean apply(Integer x) {
+            return x > 0;
         }
 
     };
 
-    private static final Function2<Integer, Integer, Integer> myOperation = new Function2<Integer, Integer, Integer>() {
+    private static final Function2<Integer, Integer, Integer> Substraction = new Function2<Integer, Integer, Integer>() {
 
         @Override
         public Integer apply(Integer x, Integer y) {
-            if (x+y >= 5) {
-                return (x+y) * 2;
-            }
-            else {
-                return x + y;
-            }
+            return x - y;
         }
 
     };
@@ -35,36 +30,36 @@ public class TestCollections {
     @Test
     public void testMap() {
 
-        List<Integer> myList = Arrays.asList(1, 12, 123);
+        List<Integer> myList = Arrays.asList(0, -12, 123);
         List<Boolean> realRes = Arrays.asList(false, false, true);
-        assertTrue(realRes.equals(Collections.map(lenMod5Is3, myList)));
+        assertEquals(realRes, Collections.map(MoreThanNull, myList));
 
     }
 
     @Test
     public void testFilter() {
 
-        List<Integer> myList = Arrays.asList(1, 212, 123);
-        List<Integer> realRes = Arrays.asList(212,123);
-        assertTrue(realRes.equals(Collections.filter(lenMod5Is3, myList)));
+        List<Integer> myList = Arrays.asList(-1, 212, 123);
+        List<Integer> realRes = Arrays.asList(212, 123);
+        assertEquals(realRes, Collections.filter(MoreThanNull, myList));
 
     }
 
     @Test
     public void testTakeWhile() {
 
-        List<Integer> myList = Arrays.asList(999, 123, 12);
-        List<Integer> realRes = Arrays.asList(999,123);
-        assertTrue(realRes.equals(Collections.takeWhile(lenMod5Is3, myList)));
+        List<Integer> myList = Arrays.asList(999, 123, -12);
+        List<Integer> realRes = Arrays.asList(999, 123);
+        assertEquals(realRes, Collections.takeWhile(MoreThanNull, myList));
 
     }
 
     @Test
     public void testTakeUnless() {
 
-        List<Integer> myList = Arrays.asList(12, 99, 123);
-        List<Integer> realRes = Arrays.asList(12,99);
-        assertTrue(realRes.equals(Collections.takeUnless(lenMod5Is3, myList)));
+        List<Integer> myList = Arrays.asList(-12, -99, 123);
+        List<Integer> realRes = Arrays.asList(-12, -99);
+        assertEquals(realRes, Collections.takeUnless(MoreThanNull, myList));
 
     }
 
@@ -72,8 +67,8 @@ public class TestCollections {
     public void testFoldlAndFoldr() {
 
         List<Integer> myList = Arrays.asList(1,1,4);
-        assertTrue(Collections.foldl(myOperation, 1, myList) == 14);
-        assertTrue(Collections.foldr(myOperation, 1, myList) == 46);
+        assertTrue(Collections.foldl(Substraction, 1, myList) == -5);
+        assertTrue(Collections.foldr(Substraction, 1, myList) == 3);
     }
 
 

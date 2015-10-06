@@ -25,6 +25,17 @@ public class TestPredicate {
     };
 
 
+    private static final Predicate<Integer> isOddWithFail = new Predicate<Integer>() {
+
+        @Override
+        public Boolean apply(Integer x) {
+            fail();
+            return x % 2 == 1;
+        }
+
+    };
+
+
     @Test
     public void testAlwaysTrue() {
 
@@ -53,6 +64,15 @@ public class TestPredicate {
     }
 
     @Test
+    public void testLazyOr() {
+
+        Predicate<Integer> or = isEven.or(isOddWithFail);;
+        assertTrue(or.apply(4));
+
+
+    }
+
+    @Test
     public void testAnd() {
 
         Predicate<Integer> and = isEven.and(lenNotTwo);
@@ -61,6 +81,15 @@ public class TestPredicate {
         assertFalse(and.apply(24));
         assertFalse(and.apply(3));
         assertFalse(and.apply(23));
+
+    }
+
+    @Test
+    public void testLazyAnd() {
+
+        Predicate<Integer> and = isEven.and(isOddWithFail);
+        assertFalse(and.apply(5));
+
 
     }
 
