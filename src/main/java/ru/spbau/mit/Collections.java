@@ -6,7 +6,7 @@ import java.util.List;
 
 public abstract class Collections {
 
-    public static <T, R> Iterable<R> map(Function1<? super T, R> f, Iterable<T> l) {
+    public static <T, R> Iterable<R> map(Function1<? super T, ? extends R> f, Iterable<T> l) {
 
         List<R> res = new ArrayList<>();
         for (T element: l) {
@@ -24,7 +24,7 @@ public abstract class Collections {
                 res.add(element);
             }
         }
-        
+
         return res;
 
     }
